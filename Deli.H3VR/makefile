@@ -1,4 +1,4 @@
-CONTENTS += $(NAME).dll
+CONTENTS += hooks.conf $(NAME).dll
 
 .PHONY: all macros-pre compile macros-post clean
 

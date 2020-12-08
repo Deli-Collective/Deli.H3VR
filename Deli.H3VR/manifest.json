@@ -2,7 +2,7 @@
   "guid": "deli.h3vr",
   "version": "MACRO_VERSION",
   "dependencies": {
-    "deli.core": "0.2.5"
+    "deli.monomod.hookgen": "0.2.5"
   },
   "name": "Deli H3VR",
   "sourceUrl": "https://github.com/Deli-Counter/Deli.H3VR",
@@ -10,6 +10,9 @@
     "Ash",
     "other contributors" 
   ],
+  "patcher": {
+    "hooks.conf": "monomod.hookgen"
+  },
   "runtime": {
     "Deli.H3VR.dll": "assembly"
   }
