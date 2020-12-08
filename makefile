@@ -48,7 +48,8 @@ $(ZIP): $(PROJS)
 		mkdir -p $$d; \
 	done
 
-	cp legacy.json $(TEMP_LEGACY)/manifest.json
+	sed -e 's|MACRO_VERSION|$(VERSION)|g' \
+		legacy.json > $(TEMP_LEGACY)/manifest.json
 	mv $(CONTENTS_MODS) $(TEMP_MODS)/
 
 	cd $(TEMP); \
