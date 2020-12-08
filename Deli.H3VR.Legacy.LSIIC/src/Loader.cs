@@ -9,10 +9,9 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using UnityEngine;
 
-namespace Deli.H3VR
+namespace Deli.H3VR.Legacy.LSIIC
 {
-	[QuickNamedBind("deli.h3vr.fvrobject")]
-	internal class ObjectAssetLoader : IAssetLoader
+	internal class VirtualObjectAssetLoader : IAssetLoader
 	{
 		private readonly ManualLogSource _logger;
 		private readonly Dictionary<string, AssetBundle> _bundles;
@@ -20,7 +19,7 @@ namespace Deli.H3VR
 		private readonly AccessTools.FieldRef<FVRObject, AssetID> _anvilPrefabOf;
 		private readonly AccessTools.FieldRef<IM, Dictionary<string, ItemSpawnerID>> _idsOf;
 
-		public ObjectAssetLoader(ManualLogSource logger)
+		public VirtualObjectAssetLoader(ManualLogSource logger)
 		{
 			_logger = logger;
 			_bundles = new Dictionary<string, AssetBundle>();

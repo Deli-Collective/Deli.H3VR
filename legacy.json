@@ -1,0 +1,15 @@
+{
+  "guid": "deli.h3vr.legacy",
+  "version": "MACRO_VERSION",
+  "dependencies": {
+    "deli.h3vr.legacy.lsiic": "MACRO_VERSION"
+  },
+  "name": "Deli H3VR (Legacy)",
+  "sourceUrl": "https://github.com/Deli-Counter/Deli.H3VR",
+  "authors": [
+    "You" 
+  ],
+  "runtime": {
+    "VirtualObjects/**": "lsiic.virtualobject"
+  }
+}

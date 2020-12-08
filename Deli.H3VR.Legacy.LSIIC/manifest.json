@@ -1,10 +1,10 @@
 {
-  "guid": "deli.h3vr",
+  "guid": "deli.h3vr.legacy.lsiic",
   "version": "MACRO_VERSION",
   "dependencies": {
     "deli.monomod.hookgen": "0.2.5"
   },
-  "name": "Deli H3VR",
+  "name": "Deli H3VR (LSIIC)",
   "sourceUrl": "https://github.com/Deli-Counter/Deli.H3VR",
   "authors": [ 
     "Ash",
@@ -14,6 +14,6 @@
     "hooks.conf": "monomod.hookgen"
   },
   "runtime": {
-    "Deli.H3VR.dll": "assembly"
+    "Deli.H3VR.Legacy.LSIIC.dll": "assembly"
   }
 }

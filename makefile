@@ -20,14 +20,19 @@ export MANIFEST_OLD     = $(MANIFEST).old
 export CONTENTS         = $(MANIFEST)
 
 # Local
-NAME      = Deli.H3VR
-ZIP       = $(NAME).zip
-TEMP      = temp
+NAME                 = Deli.H3VR
+ZIP                  = $(NAME).zip
+TEMP                 = temp
 
-PROJ_ROOT = $(NAME)
-PROJS     = $(PROJ_ROOT)
+PROJ_LEGACY          = $(NAME).Legacy
+PROJ_LSIIC           = $(PROJ_LEGACY).LSIIC
+PROJS                = $(PROJ_LSIIC)
 
-TEMP_MODS = temp/mods
+TEMP_MODS            = temp/mods
+TEMP_LEGACY          = $(TEMP_MODS)/legacy
+TEMP_VIRTUAL_OBJECTS = $(TEMP_LEGACY)/VirtualObjects
+TEMP_DIRS            = $(TEMP_MODS) $(TEMP_VIRTUAL_OBJECTS)
+
 CONTENTS_MODS  = $(addsuffix /*.deli,$(PROJS))
 
 .PHONY: FORCE all clean
@@ -39,8 +44,11 @@ $(PROJS): FORCE
 	"$(MAKE)" -C "$@" NAME="$@" PACKAGE="$@.deli"
 
 $(ZIP): $(PROJS)
-	mkdir -p $(TEMP_MODS)
-	
+	for d in $(TEMP_DIRS); do \
+		mkdir -p $$d; \
+	done
+
+	cp legacy.json $(TEMP_LEGACY)/manifest.json
 	mv $(CONTENTS_MODS) $(TEMP_MODS)/
 
 	cd $(TEMP); \
