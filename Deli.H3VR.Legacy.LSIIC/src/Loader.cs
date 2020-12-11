@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using ADepIn;
@@ -8,6 +9,7 @@ using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Deli.H3VR.Legacy.LSIIC
 {
@@ -22,8 +24,7 @@ namespace Deli.H3VR.Legacy.LSIIC
 			_bundles = new Dictionary<string, AssetBundle>();
 
 			On.FistVR.IM.GenerateItemDBs += InjectObjects;
-			On.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
-			// IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
+			IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
 		}
 
 		private void InjectObjects(On.FistVR.IM.orig_GenerateItemDBs orig, IM self)
@@ -93,75 +94,18 @@ namespace Deli.H3VR.Legacy.LSIIC
 			}
 		}
 
-		private AnvilCallbackBase RedirectBundles(On.AnvilManager.orig_GetAssetBundleAsyncInternal orig, string bundle)
+		private void RedirectBundles(ILContext il)
 		{
-			if (_bundles.TryGetValue(bundle, out var cached))
-			{
-				return new AnvilCallback<AssetBundle>(new AnvilDummyOperation(cached), null);
-			}
+			var c = new ILCursor(il);
 
-			return orig(bundle);
+			// Move right before the dummy operation
+			c.GotoNext(i => i.MatchCall(typeof(File), nameof(File.Exists)), i => i.MatchBrtrue(out _))
+				.GotoNext(i => i.MatchLdnull(), i => i.MatchNewobj<AnvilDummyOperation>());
+
+			c.Remove(); // Remove ldnull
+			c.Emit(OpCodes.Ldarg_0); // bundle
+			c.EmitDelegate<Func<string, Object>>(bundle => _bundles.TryGetValue(bundle, out var cached) ? cached : null);
 		}
-
-		// private void RedirectBundles(ILContext il)
-		// {
-		// 	var c = new ILCursor(il);
-
-		// 	// Reflective
-		// 	var tryGetReflective = AccessTools.Method(typeof(Dictionary<string, AssetBundle>), nameof(Dictionary<string, AssetBundle>.TryGetValue));
-		// 	var anvilDummerOperationCtorReflective = AccessTools.Constructor(typeof(AnvilDummyOperation));
-
-		// 	// Imported reflectives
-		// 	var tryGet = il.Module.ImportReference(tryGetReflective);
-		// 	var anvilDummerOperationCtor = il.Module.ImportReference(anvilDummerOperationCtorReflective);
-
-		// 	// Types
-		// 	var bundleType = il.Module.ImportReference(typeof(AssetBundle));
-
-		// 	// Variables
-		// 	var outVar = new VariableDefinition(bundleType);
-		// 	il.Body.Variables.Add(outVar);
-
-		// 	// Move into if (!File.Exists)
-		// 	c.GotoNext(MoveType.After,
-		// 		i => i.MatchCall("System.IO.File", nameof(File.Exists)),
-		// 		i => i.MatchBrtrue(out _));
-
-		// 	// Extract the ret-like local and ret-like label
-		// 	var fileNotFound = c.MarkLabel();
-		// 	Option<int> retLocOpt = default;
-		// 	Option<ILLabel> retJmpOpt = default;
-		// 	c.GotoNext(i =>
-		// 	{
-		// 		var result = i.MatchStloc(out int retLoc);
-		// 		retLocOpt = Option.Some(retLoc);
-		// 		return result;
-		// 	}, i =>
-		// 	{
-		// 		var result = i.MatchBr(out var retJmp);
-		// 		retJmpOpt = Option.Some(retJmp);
-		// 		return result;
-		// 	});
-		// 	var retVar = il.Body.Variables[retLocOpt.Unwrap()];
-		// 	var retJmp = retJmpOpt.Unwrap();
-		// 	c.GotoLabel(fileNotFound);
-
-		// 	//	if (_bundles.TryGetValue(bundle, out var cached))
-		// 	//	{ ... }
-		// 	//	else...
-		// 	c.EmitReference(_bundles); // _bundles
-		// 	c.Emit(OpCodes.Ldarg_0); // bundle
-		// 	c.Emit(OpCodes.Ldloca, outVar); // out cached
-		// 	c.Emit(OpCodes.Callvirt, tryGet); // TryGetValue(...)
-		// 	c.Emit(OpCodes.Brfalse, fileNotFound); // else...
-		// 	{
-		// 		//	request = new AnvilDummyOperation(cached);
-		// 		c.Emit(OpCodes.Ldloc, outVar); // cached
-		// 		c.Emit(OpCodes.Newobj, anvilDummerOperationCtorReflective); // new AnvilDummyOperation(...)
-		// 		c.Emit(OpCodes.Stloc, retVar); // request = ...
-		// 		c.Emit(OpCodes.Br, retJmp);
-		// 	}
-		// }
 
 		public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
 		{
