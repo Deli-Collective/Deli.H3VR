@@ -27,6 +27,20 @@ namespace Deli.H3VR.Legacy.LSIIC
 			IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
 		}
 
+		public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
+		{
+			if (Path.GetExtension(path) == "manifest")
+			{
+				// We don't care for these files, but the glob will match these files anyway.
+				return;
+			}
+
+			var bundle = mod.Resources.Get<AssetBundle>(path).Expect("Asset bundle not found at " + path);
+			var id = mod.Info.Guid + ":" + path;
+
+			_bundles.Add(id, bundle);
+		}
+
 		private void InjectObjects(On.FistVR.IM.orig_GenerateItemDBs orig, IM self)
 		{
 			orig(self);
@@ -105,14 +119,6 @@ namespace Deli.H3VR.Legacy.LSIIC
 			c.Remove(); // Remove ldnull
 			c.Emit(OpCodes.Ldarg_0); // bundle
 			c.EmitDelegate<Func<string, Object>>(bundle => _bundles.TryGetValue(bundle, out var cached) ? cached : null);
-		}
-
-		public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
-		{
-			var bundle = mod.Resources.Get<AssetBundle>(path).Expect("Asset bundle not found at " + path);
-			var id = mod.Info.Guid + ":" + path;
-
-			_bundles.Add(id, bundle);
 		}
 	}
 }
