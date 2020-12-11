@@ -22,7 +22,8 @@ namespace Deli.H3VR.Legacy.LSIIC
 			_bundles = new Dictionary<string, AssetBundle>();
 
 			On.FistVR.IM.GenerateItemDBs += InjectObjects;
-			IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
+			On.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
+			// IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
 		}
 
 		private void InjectObjects(On.FistVR.IM.orig_GenerateItemDBs orig, IM self)
@@ -92,66 +93,75 @@ namespace Deli.H3VR.Legacy.LSIIC
 			}
 		}
 
-		private void RedirectBundles(ILContext il)
+		private AnvilCallbackBase RedirectBundles(On.AnvilManager.orig_GetAssetBundleAsyncInternal orig, string bundle)
 		{
-			var c = new ILCursor(il);
-
-			// Reflective
-			var existsMethodReflective = AccessTools.Method(typeof(File), nameof(File.Exists));
-			var tryGetReflective = AccessTools.Method(typeof(Dictionary<string, AssetBundle>), nameof(Dictionary<string, AssetBundle>.TryGetValue));
-
-			// Imported reflectives
-			var existsMethod = il.Module.ImportReference(existsMethodReflective);
-			var tryGetMethod = il.Module.ImportReference(tryGetReflective);
-
-			// Types
-			var bundleType = il.Module.ImportReference(typeof(AssetBundle));
-			var anvilDummyOperationType = il.Module.ImportReference(typeof(AnvilDummyOperation));
-
-			// Variables
-			var outVar = new VariableDefinition(bundleType);
-			il.Body.Variables.Add(outVar);
-
-			// Move into if (!File.Exists)
-			c.GotoNext(MoveType.After,
-				i => i.OpCode == OpCodes.Call && i.Operand == existsMethod,
-				il => il.OpCode == OpCodes.Brtrue);
-
-			// Extract the ret-like local and ret-like label
-			var fileNotFound = c.MarkLabel();
-			Option<int> retLocOpt = default;
-			Option<ILLabel> retJmpOpt = default;
-			c.GotoNext(i =>
+			if (_bundles.TryGetValue(bundle, out var cached))
 			{
-				var result = i.MatchStloc(out int retLoc);
-				retLocOpt = Option.Some(retLoc);
-				return result;
-			}, i =>
-			{
-				var result = i.MatchBr(out var retJmp);
-				retJmpOpt = Option.Some(retJmp);
-				return result;
-			});
-			var retVar = il.Body.Variables[retLocOpt.Unwrap()];
-			var retJmp = retJmpOpt.Unwrap();
-			c.GotoLabel(fileNotFound);
-
-			//	if (_bundles.TryGetValue(bundle, out var cached))
-			//	{ ... }
-			//	else...
-			c.EmitReference(_bundles);
-			c.Emit(OpCodes.Ldarg_0); // bundle
-			c.Emit(OpCodes.Ldloca, outVar); // out var cached
-			c.Emit(OpCodes.Callvirt, tryGetMethod); // TryGetValue(...)
-			c.Emit(OpCodes.Brfalse, fileNotFound); // else...
-			{
-				//	request = new AnvilDummyOperation(cached.Assets);
-				c.Emit(OpCodes.Ldloc, outVar); // cached
-				c.Emit(OpCodes.Newobj, anvilDummyOperationType); // new AnvilDummyOperation(...)
-				c.Emit(OpCodes.Stloc, retVar); // request = ...
+				return new AnvilCallback<AssetBundle>(new AnvilDummyOperation(cached), null);
 			}
-			c.Emit(OpCodes.Br, retJmp);
+
+			return orig(bundle);
 		}
+
+		// private void RedirectBundles(ILContext il)
+		// {
+		// 	var c = new ILCursor(il);
+
+		// 	// Reflective
+		// 	var tryGetReflective = AccessTools.Method(typeof(Dictionary<string, AssetBundle>), nameof(Dictionary<string, AssetBundle>.TryGetValue));
+		// 	var anvilDummerOperationCtorReflective = AccessTools.Constructor(typeof(AnvilDummyOperation));
+
+		// 	// Imported reflectives
+		// 	var tryGet = il.Module.ImportReference(tryGetReflective);
+		// 	var anvilDummerOperationCtor = il.Module.ImportReference(anvilDummerOperationCtorReflective);
+
+		// 	// Types
+		// 	var bundleType = il.Module.ImportReference(typeof(AssetBundle));
+
+		// 	// Variables
+		// 	var outVar = new VariableDefinition(bundleType);
+		// 	il.Body.Variables.Add(outVar);
+
+		// 	// Move into if (!File.Exists)
+		// 	c.GotoNext(MoveType.After,
+		// 		i => i.MatchCall("System.IO.File", nameof(File.Exists)),
+		// 		i => i.MatchBrtrue(out _));
+
+		// 	// Extract the ret-like local and ret-like label
+		// 	var fileNotFound = c.MarkLabel();
+		// 	Option<int> retLocOpt = default;
+		// 	Option<ILLabel> retJmpOpt = default;
+		// 	c.GotoNext(i =>
+		// 	{
+		// 		var result = i.MatchStloc(out int retLoc);
+		// 		retLocOpt = Option.Some(retLoc);
+		// 		return result;
+		// 	}, i =>
+		// 	{
+		// 		var result = i.MatchBr(out var retJmp);
+		// 		retJmpOpt = Option.Some(retJmp);
+		// 		return result;
+		// 	});
+		// 	var retVar = il.Body.Variables[retLocOpt.Unwrap()];
+		// 	var retJmp = retJmpOpt.Unwrap();
+		// 	c.GotoLabel(fileNotFound);
+
+		// 	//	if (_bundles.TryGetValue(bundle, out var cached))
+		// 	//	{ ... }
+		// 	//	else...
+		// 	c.EmitReference(_bundles); // _bundles
+		// 	c.Emit(OpCodes.Ldarg_0); // bundle
+		// 	c.Emit(OpCodes.Ldloca, outVar); // out cached
+		// 	c.Emit(OpCodes.Callvirt, tryGet); // TryGetValue(...)
+		// 	c.Emit(OpCodes.Brfalse, fileNotFound); // else...
+		// 	{
+		// 		//	request = new AnvilDummyOperation(cached);
+		// 		c.Emit(OpCodes.Ldloc, outVar); // cached
+		// 		c.Emit(OpCodes.Newobj, anvilDummerOperationCtorReflective); // new AnvilDummyOperation(...)
+		// 		c.Emit(OpCodes.Stloc, retVar); // request = ...
+		// 		c.Emit(OpCodes.Br, retJmp);
+		// 	}
+		// }
 
 		public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
 		{
