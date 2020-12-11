@@ -16,16 +16,10 @@ namespace Deli.H3VR.Legacy.LSIIC
 		private readonly ManualLogSource _logger;
 		private readonly Dictionary<string, AssetBundle> _bundles;
 
-		private readonly AccessTools.FieldRef<FVRObject, AssetID> _anvilPrefabOf;
-		private readonly AccessTools.FieldRef<IM, Dictionary<string, ItemSpawnerID>> _idsOf;
-
 		public VirtualObjectAssetLoader(ManualLogSource logger)
 		{
 			_logger = logger;
 			_bundles = new Dictionary<string, AssetBundle>();
-
-			_anvilPrefabOf = AccessTools.FieldRefAccess<FVRObject, AssetID>("m_anvilPrefab");
-			_idsOf = AccessTools.FieldRefAccess<IM, Dictionary<string, ItemSpawnerID>>("SpawnerIDDic");
 
 			On.FistVR.IM.GenerateItemDBs += InjectObjects;
 			IL.AnvilManager.GetAssetBundleAsyncInternal += RedirectBundles;
@@ -35,18 +29,20 @@ namespace Deli.H3VR.Legacy.LSIIC
 		{
 			orig(self);
 
-			var guidToId = _idsOf(self);
+			var guidToId = self.SpawnerIDDic;
 
 			foreach (var bundlePair in _bundles)
 			{
 				var name = bundlePair.Key;
 				var bundle = bundlePair.Value;
 
+				// Inject objects
 				foreach (var obj in bundle.LoadAllAssets<FVRObject>())
 				{
-					var original = _anvilPrefabOf(obj);
-					original.Bundle = name;
+					// Redirect the bundle of the object
+					obj.m_anvilPrefab.Bundle = name;
 
+					// Add it to the object dictionary (OD)
 					IM.OD.Add(obj.ItemID, obj);
 
 					void AppendKeyAll<TKey>(Dictionary<TKey, List<FVRObject>> dict, Dictionary<TKey, HashSet<FVRObject>> set, TKey key)
@@ -63,6 +59,7 @@ namespace Deli.H3VR.Legacy.LSIIC
 						}
 					}
 
+					// A lot of appending to dictionaries
 					AppendKeyAll(self.odicTagAttachmentFeature, self.ohasgTagAttachmentFeature, obj.TagAttachmentFeature);
 					AppendKeyAll(self.odicTagAttachmentMount, self.ohasgTagAttachmentMount, obj.TagAttachmentMount);
 					AppendKeyAll(self.odicTagCategory, self.ohashTagCategory, obj.Category);
@@ -74,6 +71,7 @@ namespace Deli.H3VR.Legacy.LSIIC
 					AppendKeyAll(self.odicTagFirearmSize, self.ohashTagFirearmSize, obj.TagFirearmSize);
 				}
 
+				// Inject spawners
 				foreach (var id in bundle.LoadAllAssets<ItemSpawnerID>())
 				{
 					var guid = id.ItemID;
@@ -84,8 +82,11 @@ namespace Deli.H3VR.Legacy.LSIIC
 						continue;
 					}
 
-					IM.CD[id.Category].Add(id);
-					IM.SCD[id.SubCategory].Add(id);
+					// Category dictionary (CD)
+					IM.CD.GetOrInsertWith(id.Category, () => new List<ItemSpawnerID>()).Add(id);
+					// Subcategory dictionary (SCD)
+					IM.SCD.GetOrInsertWith(id.SubCategory, () => new List<ItemSpawnerID>()).Add(id);
+
 					guidToId.Add(guid, id);
 				}
 			}
