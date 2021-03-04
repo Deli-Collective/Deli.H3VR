@@ -1,0 +1,16 @@
+{
+  "guid": "deli.h3vr.anvil_asset_bundle_injector",
+  "version": "MACRO_VERSION",
+  "require": "0.3",
+  "name": "Deli H3VR (Anvil Asset Bundle Injector)",
+  "authors": [ "ash-hat" ],
+  "source_url": "https://github.com/Deli-Counter/Deli.H3VR",
+  "assets": {
+    "patcher": {
+      "hooks.conf": "deli:monomod.hookgen"
+    },
+    "setup": {
+      "Deli.H3VR.AnvilAssetBundleInjector.dll": "deli:assembly"
+    }
+  }
+}
