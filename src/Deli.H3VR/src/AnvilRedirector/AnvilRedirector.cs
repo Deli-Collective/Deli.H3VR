@@ -10,7 +10,7 @@ using MonoMod.Cil;
 using UnityEngine;
 using Object = System.Object;
 
-namespace Deli.H3VR.AnvilAssetBundleInjector
+namespace Deli.H3VR
 {
 	public class AnvilRedirector : DeliBehaviour
 	{

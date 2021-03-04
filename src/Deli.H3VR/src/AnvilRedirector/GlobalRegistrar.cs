@@ -5,7 +5,7 @@ using Deli.Runtime;
 using Deli.Runtime.Yielding;
 using UnityEngine;
 
-namespace Deli.H3VR.AnvilAssetBundleInjector
+namespace Deli.H3VR
 {
 	internal class GlobalRegistrar : IEnumerable<AssetBundle>
 	{
@@ -23,11 +23,12 @@ namespace Deli.H3VR.AnvilAssetBundleInjector
 			return true;
 		}
 
-		public ResultYieldInstruction<AssetBundle> Add(Mod mod, DelayedTypedFileHandle<AssetBundle> file)
+		public ResultYieldInstruction<AssetBundle> Add(Mod mod, DelayedTypedFileHandle<AssetBundle> file, out string key)
 		{
-			var key = mod.Info.Guid + ":" + file.Path;
+			key = mod.Info.Guid + ":" + file.Path;
 
-			return file.GetOrRead().CallbackWith(bundle => _bundles.Add(key, bundle));
+			var keyC = key;
+			return file.GetOrRead().CallbackWith(bundle => _bundles.Add(keyC, bundle));
 		}
 
 		public Dictionary<string, AssetBundle>.ValueCollection.Enumerator GetEnumerator()

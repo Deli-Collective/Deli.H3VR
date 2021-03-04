@@ -2,7 +2,7 @@ using Deli.Runtime;
 using Deli.Runtime.Yielding;
 using UnityEngine;
 
-namespace Deli.H3VR.AnvilAssetBundleInjector
+namespace Deli.H3VR
 {
 	public class ModRegistrar
 	{
@@ -15,9 +15,9 @@ namespace Deli.H3VR.AnvilAssetBundleInjector
 			_global = global;
 		}
 
-		public ResultYieldInstruction<AssetBundle> Add(DelayedTypedFileHandle<AssetBundle> file)
+		public ResultYieldInstruction<AssetBundle> Add(DelayedTypedFileHandle<AssetBundle> file, out string key)
 		{
-			return _global.Add(_mod, file);
+			return _global.Add(_mod, file, out key);
 		}
 	}
 }
