@@ -1,23 +1,25 @@
+include ../makefile.var
 CONTENTS += hooks.conf $(NAME).dll
 
-.PHONY: all macros-pre compile macros-post clean
+.PHONY: all precompile compile postcompile clean
 
-all: clean $(PACKAGE) macros-post
+all: clean $(MOD)
+build: precompile compile postcompile
 
-macros-pre:
+$(MOD): build
+	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS)) 
+
+precompile:
 	tee $(MANIFEST).old < $(MANIFEST)
 	sed -i \
 		-e 's|MACRO_VERSION|$(VERSION)|g' \
 		$(MANIFEST)
 
-compile: macros-pre
+compile:
 	$(BUILD)
 
-$(PACKAGE): compile
-	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
-
-macros-post: $(PACKAGE)
+postcompile: $(PACKAGE)
 	mv $(MANIFEST_OLD) $(MANIFEST)
 
 clean:
-	rm -f $(PACKAGE)
+	rm -f $(MOD)
