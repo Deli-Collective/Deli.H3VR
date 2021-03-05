@@ -18,14 +18,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 5.0.x
 
     - name: Execute make
       shell: bash
-      run: make
+      run: make -C src
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Deli.H3VR
-        path: Deli.H3VR.zip
+        path: src/Deli.H3VR.zip
