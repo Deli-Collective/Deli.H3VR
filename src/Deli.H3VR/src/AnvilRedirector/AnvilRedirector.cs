@@ -61,11 +61,17 @@ namespace Deli.H3VR
 
 			var gotoIfTrue = c.MarkLabel();
 
+			var getStreamingAssetsPath = typeof(Application).GetProperty(nameof(Application.streamingAssetsPath))?.GetGetMethod();
+			if (getStreamingAssetsPath is null)
+			{
+				throw new InvalidOperationException($"Failed to find getter of property {typeof(Application)}.{nameof(Application.streamingAssetsPath)}");
+			}
+
 			// Move after the anvil cache
 			c.GotoPrev(
 				MoveType.AfterLabel,
-				i => i.MatchCall(typeof(Application), nameof(Application.streamingAssetsPath)),
-				i => i.MatchLdloc(0),
+				i => i.MatchCall(getStreamingAssetsPath),
+				i => i.MatchLdarg(0),
 				i => i.MatchCall(typeof(Path), nameof(Path.Combine))
 			);
 
