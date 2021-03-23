@@ -1,10 +1,12 @@
-name: makefile
+name: main
 
 on:
   push:
+    branches:
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   makefile:
@@ -21,7 +23,6 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: Execute make
-      shell: bash
       run: make -C src
     
     - name: Upload artifacts
