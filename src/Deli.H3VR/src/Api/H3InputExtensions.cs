@@ -13,7 +13,7 @@ namespace Deli.H3VR.Api
 		/// <param name="width">The number of degrees away from the center that is allowed</param>
 		/// <returns>If the touchpad is pressed down in the given direction</returns>
 		/// <example>
-		///		IsTouchpadPressedWithinRange(hand, Vector2.up, 45f);
+		///		IsTouchpadPressedInDirection(hand.Input, Vector2.up, 45f);
 		/// </example>
 		public static bool IsTouchpadPressedInDirection(this HandInput hand, Vector2 direction, float width=45f)
 		{
