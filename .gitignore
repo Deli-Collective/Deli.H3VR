@@ -359,5 +359,8 @@ MigrationBackup/
 # VS Code
 .vscode/
 
+# Libs we can't include in the repo
+src/libs/UnityEngine.UI.dll
+
 # make byproduct
 Deli.H3VR.zip

@@ -3,7 +3,7 @@
   "version": "MACRO_VERSION",
   "require": "0.3",
   "name": "Deli H3VR",
-  "authors": [ "ash-hat" ],
+  "authors": [ "ash-hat", "Nathan Gill"],
   "source_url": "https://github.com/Deli-Counter/Deli.H3VR",
   "assets": {
     "patcher": {
