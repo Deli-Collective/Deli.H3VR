@@ -17,7 +17,7 @@ namespace Deli.H3VR.Api
 		/// </example>
 		public static bool IsTouchpadPressedInDirection(this HandInput hand, Vector2 direction, float width=45f)
 		{
-			return hand.TouchpadDown && hand.TouchpadAxes.magnitude > .25f && Vector2.Angle(hand.TouchpadAxes, direction) <= width;
+			return hand.TouchpadDown && hand.TouchpadAxes.sqrMagnitude > .0625f && Vector2.Angle(hand.TouchpadAxes, direction) <= width;
 		}
 	}
 }
