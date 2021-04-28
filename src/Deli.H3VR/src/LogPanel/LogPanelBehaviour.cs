@@ -17,7 +17,7 @@ namespace Deli.H3VR.LogPanel
 		public LogPanelBehaviour()
 		{
 			// Register a new wrist menu button
-			WristMenuButtons.RegisterWristMenuButton("BepInEx Log", SpawnLogPanel);
+			WristMenuButtons.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
 
 			// Register ourselves as the new log listener and try to grab what's already been captured
 			BepInEx.Logging.Logger.Listeners.Add(this);
@@ -45,14 +45,14 @@ namespace Deli.H3VR.LogPanel
 				GameObject panel = Instantiate(wristMenu.OptionsPanelPrefab);
 				Transform canvasTransform = CleanPanel(panel);
 				_logPanel = panel.AddComponent<BepInExLogPanel>();
-				_logPanel.CreateWithExisting(canvasTransform, _logEvents);
+				_logPanel.CreateWithExisting(Source, canvasTransform, _logEvents);
 			}
 
 			// Then we just make the hand pick up the panel
 			wristMenu.m_currentHand.RetrieveObject(_logPanel.GetComponent<FVRPhysicalObject>());
 		}
 
-		private Transform CleanPanel(GameObject panel)
+		private static Transform CleanPanel(GameObject panel)
 		{
 			Transform panelTransform = panel.transform;
 
@@ -80,7 +80,13 @@ namespace Deli.H3VR.LogPanel
 			return canvas;
 		}
 
-		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs) => _logEvents.Add(eventArgs);
+		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs)
+		{
+			_logEvents.Add(eventArgs);
+
+			// If we have a log panel active let it update too
+			if (_logPanel && _logPanel is not null) _logPanel.UpdateText();
+		}
 
 		void IDisposable.Dispose()
 		{
