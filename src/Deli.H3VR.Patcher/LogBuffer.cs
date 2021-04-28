@@ -1,11 +1,11 @@
-﻿using System;
 using System.Collections.Generic;
 using BepInEx.Logging;
 using Deli.Patcher;
 
 namespace Deli.H3VR.Patcher
 {
-	internal class LogBuffer : DeliModule, ILogListener
+	// ReSharper disable once ClassNeverInstantiated.Global
+	public class LogBuffer : DeliModule, ILogListener
 	{
 		// We'll need a reference to this from the behaviour
 		internal static LogBuffer? Instance { get; private set; }
@@ -25,7 +25,7 @@ namespace Deli.H3VR.Patcher
 		}
 
 		// Capture log events
-		internal List<LogEventArgs> LogEvents = new();
+		internal readonly List<LogEventArgs> LogEvents = new();
 		public void LogEvent(object sender, LogEventArgs eventArgs) => LogEvents.Add(eventArgs);
 
 	}
