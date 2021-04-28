@@ -1,34 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net35</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-        <PackageId>Deli.H3VR</PackageId>
-        <Title>Deli.H3VR</Title>
-        <Authors>nrgill28</Authors>
-        <Description>API and assistive interfacing code for modding H3VR with Deli</Description>
-        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-
-        <PackageProjectUrl>https://github.com/Deli-Collective/Deli.H3VR</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Deli-Collective/Deli.H3VR.git</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Deli" Version="0.3.2" />
         <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" PrivateAssets="all" />
         <PackageReference Include="Nullable" Version="1.3.0" PrivateAssets="all" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="manifest.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="hooks.conf">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -39,12 +21,14 @@
             <HintPath>..\libs\MMHOOK_Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\libs\UnityEngine.UI.dll</HintPath>
+            <HintPath>..\libs\UnityEngine.UI.dll</HintPath>
         </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Deli.H3VR.Patcher\Deli.H3VR.Patcher.csproj" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Deli.H3VR</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

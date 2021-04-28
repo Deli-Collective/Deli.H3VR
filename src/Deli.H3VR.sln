@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.H3VR", "Deli.H3VR\Deli.H3VR.csproj", "{524710DB-DFE2-49D6-AE2A-33049043D22A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.H3VR.Patcher", "Deli.H3VR.Patcher\Deli.H3VR.Patcher.csproj", "{8A6C6B41-025F-4B6C-AE21-25B9126B6731}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +32,18 @@ Global
 		{524710DB-DFE2-49D6-AE2A-33049043D22A}.Release|x64.Build.0 = Release|Any CPU
 		{524710DB-DFE2-49D6-AE2A-33049043D22A}.Release|x86.ActiveCfg = Release|Any CPU
 		{524710DB-DFE2-49D6-AE2A-33049043D22A}.Release|x86.Build.0 = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|x64.Build.0 = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Debug|x86.Build.0 = Debug|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|x64.ActiveCfg = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|x64.Build.0 = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A6C6B41-025F-4B6C-AE21-25B9126B6731}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
