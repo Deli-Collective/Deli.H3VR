@@ -9,7 +9,7 @@ namespace Deli.H3VR.LogPanel
 {
 	public class BepInExLogPanel : DeliBehaviour, ILogListener
 	{
-		private List<LogEventArgs> _logEvents;
+		private readonly List<LogEventArgs> _logEvents;
 
 		public BepInExLogPanel()
 		{
