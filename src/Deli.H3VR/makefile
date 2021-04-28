@@ -1,5 +1,5 @@
 include ../makefile.var
-CONTENTS += hooks.conf $(NAME).dll
+CONTENTS += hooks.conf $(NAME).dll ../../../../Deli.H3VR.Patcher/bin/$(CONFIG)/$(FRAMEWORK)/$(NAME).Patcher.dll
 
 .PHONY: all precompile compile postcompile clean
 

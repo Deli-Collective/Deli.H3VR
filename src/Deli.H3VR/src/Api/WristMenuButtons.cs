@@ -13,7 +13,7 @@ namespace Deli.H3VR.Api
 		private struct ButtonOptions
 		{
 			public string Text { get; set; }
-			public UnityAction OnClick { get; set; }
+			public UnityAction<FVRWristMenu> OnClick { get; set; }
 		}
 
 		private static readonly List<ButtonOptions> Buttons = new();
@@ -62,7 +62,7 @@ namespace Deli.H3VR.Api
 				newButton.onClick.AddListener(() =>
 				{
 					self.Aud.PlayOneShot(self.AudClip_Engage);
-					options.OnClick();
+					options.OnClick(self);
 				});
 
 				// Now we need to modify some things to accomodate this new button
@@ -81,12 +81,12 @@ namespace Deli.H3VR.Api
 		/// <example>
 		/// This sample shows how to add a wrist menu button
 		/// <code>
-		/// AddWristMenuButton("New modded button", () => {
+		/// RegisterWristMenuButton("New modded button", (wristMenu) => {
 		///		Logger.LogDebug("Clicked!");
 		/// });
 		/// </code>
 		/// </example>
-		public static void AddWristMenuButton(string text, UnityAction onClick)
+		public static void RegisterWristMenuButton(string text, UnityAction<FVRWristMenu> onClick)
 		{
 			Buttons.Add(new ButtonOptions
 			{

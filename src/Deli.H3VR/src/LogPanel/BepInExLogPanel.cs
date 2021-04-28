@@ -1,54 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BepInEx.Logging;
-using Deli.H3VR.Api;
-using Deli.H3VR.Patcher;
-using Deli.Setup;
+using UnityEngine;
 
 namespace Deli.H3VR.LogPanel
 {
-	public class BepInExLogPanel : DeliBehaviour, ILogListener
+	public class BepInExLogPanel : MonoBehaviour
 	{
-		private readonly List<LogEventArgs> _logEvents;
+		private List<LogEventArgs>? _currentEvents;
+		private Transform? _canvas;
 
-		public BepInExLogPanel()
+
+		public void CreateWithExisting(Transform canvas, List<LogEventArgs> currentEvents)
 		{
-			Stages.Setup += OnSetup;
-
-			// Register ourselves as the new log listener and try to grab what's already been captured
-			BepInEx.Logging.Logger.Listeners.Add(this);
-			if (LogBuffer.Instance is not null)
-			{
-				// Grab the captured logs from the buffer and dispose it.
-				_logEvents = LogBuffer.Instance.LogEvents;
-				LogBuffer.Instance.Dispose();
-				Logger.LogInfo($"Captured logs from the patching stage: {_logEvents.Count}");
-			}
-			else
-			{
-				// If the instance was somehow null we can still continue, just without the previous logs.
-				_logEvents = new List<LogEventArgs>();
-				Logger.LogError("LogBuffer instance was null! Captured logs will start from here instead.");
-			}
+			_canvas = canvas;
+			_currentEvents = currentEvents;
 		}
 
-		private void OnSetup(SetupStage stage)
+		public void LogEvent(LogEventArgs args)
 		{
-			WristMenuButtons.AddWristMenuButton("BepInEx Log", () =>
-			{
-				Logger.LogInfo("Maybe open the log panel or something idk");
-			});
-		}
 
-		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs)
-		{
-			_logEvents.Add(eventArgs);
-		}
-
-		void IDisposable.Dispose()
-		{
-			BepInEx.Logging.Logger.Listeners.Remove(this);
-			_logEvents.Clear();
 		}
 	}
 }
