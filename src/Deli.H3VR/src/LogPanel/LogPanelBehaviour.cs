@@ -26,7 +26,6 @@ namespace Deli.H3VR.LogPanel
 				// Grab the captured logs from the buffer and dispose it.
 				_logEvents = LogBuffer.Instance.LogEvents;
 				LogBuffer.Instance.Dispose();
-				Logger.LogInfo($"Captured logs from the patching stage: {_logEvents.Count}");
 			}
 			else
 			{
@@ -85,7 +84,7 @@ namespace Deli.H3VR.LogPanel
 			_logEvents.Add(eventArgs);
 
 			// If we have a log panel active let it update too
-			if (_logPanel && _logPanel is not null) _logPanel.UpdateText();
+			if (_logPanel && _logPanel is not null) _logPanel.LogEvent();
 		}
 
 		void IDisposable.Dispose()

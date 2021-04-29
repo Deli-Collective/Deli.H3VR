@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using FistVR;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,8 @@ namespace Deli.H3VR.LogPanel
 		private ConfigEntry<int>? _fontSize;
 		private ConfigEntry<int>? _maxLines;
 		private ConfigEntry<string>? _fontName;
+
+		private int _offset = 0;
 
 		private static readonly Dictionary<LogLevel, string> LogColors = new()
 		{
@@ -60,6 +63,7 @@ namespace Deli.H3VR.LogPanel
 			_logText.alignment = TextAnchor.LowerLeft;
 			_logText.verticalOverflow = VerticalWrapMode.Overflow;
 
+
 			// Make sure the user has the requested font installed
 			if (Font.GetOSInstalledFontNames().Contains(_fontName.Value))
 			{
@@ -71,23 +75,78 @@ namespace Deli.H3VR.LogPanel
 				source.Logger.LogError($"Log panel font is set to '{_fontName.Value}' in the config but that font is not installed!");
 			}
 
+			// Get the pointable in behind and make it our custom one that does scrolling
+			FVRPointable pointable = GetComponentInChildren<FVRPointable>();
+			ScrollPointable scrollPointable = pointable.gameObject.AddComponent<ScrollPointable>();
+			scrollPointable.MaxPointingRange = pointable.MaxPointingRange;
+			scrollPointable.Panel = this;
+			Destroy(pointable);
+
+			// Lastly do an update so we're good to go!
 			UpdateText();
 		}
 
-		public void UpdateText()
+		public void Scroll(int direction)
+		{
+			if (_currentEvents is null || direction == 0) return;
+			_offset = Mathf.Clamp(_offset + direction, 0, _currentEvents.Count - 1);
+			UpdateText();
+		}
+
+		public void LogEvent()
+		{
+			// If the user is currently offset the scrolling, keep their position in the log
+			if (_offset != 0) _offset += 1;
+			UpdateText();
+		}
+
+		private void UpdateText()
 		{
 			if (_currentEvents is null || _maxLines is null || _logText is null) return;
 
 			StringBuilder sb = new();
-			int startIndex = Math.Max(0, _currentEvents.Count - _maxLines.Value);
-			for (int i = startIndex; i < _currentEvents.Count; i++)
+			int startIndex = Math.Max(0, _currentEvents.Count - _maxLines.Value - _offset);
+			for (int i = 0; i < _maxLines.Value - 1; i++)
 			{
-				LogEventArgs evt = _currentEvents[i];
+				LogEventArgs evt = _currentEvents[startIndex + i];
 				sb.AppendLine($"<color={LogColors[evt.Level]}>{evt}</color>");
 			}
 
 			sb.Append($" -- Showing lines {startIndex + 1} to {startIndex + _maxLines.Value} (of {_currentEvents.Count})");
 			_logText.text = sb.ToString();
+		}
+	}
+
+	public class ScrollPointable : FVRPointable
+	{
+		public BepInExLogPanel? Panel;
+		private float _lastScrollTime;
+
+		private const float ScrollPause = 0.05f;
+
+		public override void OnHoverDisplay()
+		{
+			if (Panel is null || Time.time < _lastScrollTime + ScrollPause) return;
+			Debug.Log(Time.time + " OnHoverDisplay!");
+			int scroll = 0;
+			foreach (var hand in PointingHands)
+			{
+				switch (hand.Input.TouchpadAxes.y)
+				{
+					case > .5f:
+						scroll = 1;
+						break;
+					case < -.5f:
+						scroll = -1;
+						break;
+					default:
+						continue;
+				}
+				break;
+			}
+
+			_lastScrollTime = Time.time;
+			Panel.Scroll(scroll);
 		}
 	}
 }
