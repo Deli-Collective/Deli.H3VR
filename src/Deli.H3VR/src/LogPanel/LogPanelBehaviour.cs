@@ -13,11 +13,13 @@ namespace Deli.H3VR.LogPanel
 	{
 		private readonly List<LogEventArgs> _logEvents;
 		private BepInExLogPanel? _logPanel;
+		private H3API _api;
 
 		public LogPanelBehaviour()
 		{
 			// Register a new wrist menu button
-			WristMenuButtons.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
+			_api = H3API.Instance;
+			_api.WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
 
 			// Register ourselves as the new log listener and try to grab what's already been captured
 			BepInEx.Logging.Logger.Listeners.Add(this);
@@ -41,42 +43,14 @@ namespace Deli.H3VR.LogPanel
 			if (_logPanel is null || !_logPanel)
 			{
 				// Make a copy of the panel, clean it and add our own component
-				GameObject panel = Instantiate(wristMenu.OptionsPanelPrefab);
-				Transform canvasTransform = CleanPanel(panel);
+				GameObject panel = _api.LockablePanel.GetCleanLockablePanel();
+				Transform canvasTransform = panel.transform.Find("OptionsCanvas_0_Main/Canvas");
 				_logPanel = panel.AddComponent<BepInExLogPanel>();
 				_logPanel.CreateWithExisting(Source, canvasTransform, _logEvents);
 			}
 
 			// Then we just make the hand pick up the panel
 			wristMenu.m_currentHand.RetrieveObject(_logPanel.GetComponent<FVRPhysicalObject>());
-		}
-
-		private static Transform CleanPanel(GameObject panel)
-		{
-			Transform panelTransform = panel.transform;
-
-			// This proto object has a bunch of hidden stuff we don't want, but it does also contain the actual panel model
-			// So just move it up and delete the proto
-			Transform proto = panelTransform.Find("OptionsPanelProto");
-			proto.Find("Tablet").SetParent(panelTransform);
-			Destroy(proto.gameObject);
-
-			// Then, everything else we want to delete in the main object is disabled so use that as a filter
-			foreach (Transform child in panelTransform)
-			{
-				if (!child.gameObject.activeSelf)
-					Destroy(child.gameObject);
-			}
-
-			// Lastly we just want to clear out the main canvas
-			Transform canvas = panelTransform.Find("OptionsCanvas_0_Main/Canvas");
-			foreach (Transform child in canvas)
-			{
-				Destroy(child.gameObject);
-			}
-
-			// Then we return the canvas for later use
-			return canvas;
 		}
 
 		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs)

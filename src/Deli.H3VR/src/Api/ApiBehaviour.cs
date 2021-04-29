@@ -5,6 +5,8 @@ namespace Deli.H3VR.Api
 {
 	public class ApiBehaviour : DeliBehaviour
 	{
+
+
 		public ApiBehaviour()
 		{
 			SteamAPI.Init();
