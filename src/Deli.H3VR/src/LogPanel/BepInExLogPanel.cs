@@ -76,7 +76,7 @@ namespace Deli.H3VR.LogPanel
 			}
 
 			// Get the pointable in behind and make it our custom one that does scrolling
-			FVRPointable pointable = GetComponentInChildren<FVRPointable>();
+			FVRPointable pointable = transform.Find("Backing").GetComponent<FVRPointable>();
 			ScrollPointable scrollPointable = pointable.gameObject.AddComponent<ScrollPointable>();
 			scrollPointable.MaxPointingRange = pointable.MaxPointingRange;
 			scrollPointable.Panel = this;
@@ -127,7 +127,6 @@ namespace Deli.H3VR.LogPanel
 		public override void OnHoverDisplay()
 		{
 			if (Panel is null || Time.time < _lastScrollTime + ScrollPause) return;
-			Debug.Log(Time.time + " OnHoverDisplay!");
 			int scroll = 0;
 			foreach (var hand in PointingHands)
 			{
