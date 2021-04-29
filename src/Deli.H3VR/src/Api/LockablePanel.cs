@@ -6,19 +6,53 @@ namespace Deli.H3VR.Api
 {
 	public class LockablePanel
 	{
-		private GameObject? _optionsPanelPrefab;
+		// We need a reference to the options panel prefab
+		internal static GameObject? OptionsPanelPrefab;
 
-		internal LockablePanel()
+		// And also a reference to this object's current panel
+		private GameObject? _currentPanel;
+		public Texture2D? TextureOverride;
+		// private Action<LayoutWidget> _widget; TODO
+		public event Action<GameObject>? Configure;
+
+		/// <summary>
+		/// Returns this instance of the lockable panel, creating and configuring it if necessary.
+		/// </summary>
+		/// <returns>The parent game object of the panel</returns>
+		public GameObject GetOrCreatePanel()
 		{
-			On.FistVR.FVRWristMenu.Awake += (_, self) => _optionsPanelPrefab = self.OptionsPanelPrefab;
+			// If we've never made a panel or it's gotten destroyed make a new one
+			if (_currentPanel is null || !_currentPanel)
+			{
+				// Make a new empty panel
+				_currentPanel = GetCleanLockablePanel();
+
+				// If we have a texture override, set it here
+				if (TextureOverride is not null && TextureOverride)
+				{
+
+					Renderer tabletRenderer = _currentPanel.transform.Find("Tablet").GetComponent<Renderer>();
+					tabletRenderer.material.mainTexture = TextureOverride;
+				}
+
+				// Invoke the configure event
+				Configure?.Invoke(_currentPanel);
+			}
+
+			return _currentPanel;
 		}
 
-		public GameObject GetCleanLockablePanel()
+		/// <summary>
+		/// Returns a new lockable panel that has been completely emptied of content
+		/// </summary>
+		/// <returns>The parent game object of the panel</returns>
+		/// <exception cref="InvalidOperationException">Method was called before a reference to the options panel prefab was taken</exception>
+		public static GameObject GetCleanLockablePanel()
 		{
-			if (_optionsPanelPrefab is null || !_optionsPanelPrefab)
+			if (OptionsPanelPrefab is null || !OptionsPanelPrefab)
 				throw new InvalidOperationException("You're trying to create a lockable panel too early! Please wait until the runtime phase.");
 
-			GameObject panel = Object.Instantiate(_optionsPanelPrefab);
+			GameObject panel = Object.Instantiate(OptionsPanelPrefab);
 			CleanPanel(panel);
 			return panel;
 		}

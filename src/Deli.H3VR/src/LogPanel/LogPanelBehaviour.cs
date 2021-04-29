@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using BepInEx.Logging;
 using Deli.H3VR.Api;
 using Deli.H3VR.Patcher;
+using Deli.Runtime;
 using Deli.Setup;
+using Deli.VFS;
 using FistVR;
 using UnityEngine;
 
@@ -12,14 +16,13 @@ namespace Deli.H3VR.LogPanel
 	public class LogPanelBehaviour : DeliBehaviour, ILogListener
 	{
 		private readonly List<LogEventArgs> _logEvents;
-		private BepInExLogPanel? _logPanel;
-		private H3API _api;
+		private readonly LockablePanel _panel;
+		private BepInExLogPanel? _logPanelComponent;
 
 		public LogPanelBehaviour()
 		{
 			// Register a new wrist menu button
-			_api = H3API.Instance;
-			_api.WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
+			H3API.GetOrInit(Source).WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
 
 			// Register ourselves as the new log listener and try to grab what's already been captured
 			BepInEx.Logging.Logger.Listeners.Add(this);
@@ -35,30 +38,40 @@ namespace Deli.H3VR.LogPanel
 				_logEvents = new List<LogEventArgs>();
 				Logger.LogError("LogBuffer instance was null! Captured logs will start from here instead.");
 			}
+
+			// Make a new LockablePanel
+			_panel = new LockablePanel();
+			_panel.Configure += panel =>
+			{
+				Transform canvasTransform = panel.transform.Find("OptionsCanvas_0_Main/Canvas");
+				_logPanelComponent = panel.AddComponent<BepInExLogPanel>();
+				_logPanelComponent.CreateWithExisting(Source, canvasTransform, _logEvents);
+			};
+
+			// Setup a callback to read and apply our texture
+			Stages.Runtime += stage => StartCoroutine(OnRuntime(stage));
 		}
 
+		private IEnumerator OnRuntime(RuntimeStage stage)
+		{
+			DelayedReader<Texture2D> texReader = stage.GetReader<Texture2D>();
+			var op = texReader(Resources.GetFile("LogPanel.png")
+			                   ?? throw new FileNotFoundException("Log panel texture is missing!"));
+			yield return op;
+			_panel.TextureOverride = op.Result;
+		}
+
+		// Wrist menu button callback. Gets our panel instance and makes the hand retrieve it.
 		private void SpawnLogPanel(FVRWristMenu wristMenu)
 		{
-			// If the log panel doesn't exist (Not yet created or scene switched and it got deleted) make a new one
-			if (_logPanel is null || !_logPanel)
-			{
-				// Make a copy of the panel, clean it and add our own component
-				GameObject panel = _api.LockablePanel.GetCleanLockablePanel();
-				Transform canvasTransform = panel.transform.Find("OptionsCanvas_0_Main/Canvas");
-				_logPanel = panel.AddComponent<BepInExLogPanel>();
-				_logPanel.CreateWithExisting(Source, canvasTransform, _logEvents);
-			}
-
-			// Then we just make the hand pick up the panel
-			wristMenu.m_currentHand.RetrieveObject(_logPanel.GetComponent<FVRPhysicalObject>());
+			GameObject panel = _panel.GetOrCreatePanel();
+			wristMenu.m_currentHand.RetrieveObject(panel.GetComponent<FVRPhysicalObject>());
 		}
 
 		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs)
 		{
 			_logEvents.Add(eventArgs);
-
-			// If we have a log panel active let it update too
-			if (_logPanel && _logPanel is not null) _logPanel.LogEvent();
+			if (_logPanelComponent && _logPanelComponent is not null) _logPanelComponent.LogEvent();
 		}
 
 		void IDisposable.Dispose()

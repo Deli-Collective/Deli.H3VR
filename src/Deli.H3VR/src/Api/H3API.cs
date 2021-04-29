@@ -2,17 +2,17 @@
 {
 	public class H3API
 	{
-		public static H3API Instance { get; private set; }
-		public LockablePanel LockablePanel { get; }
+		public static H3API? Instance { get; private set; }
 		public WristMenu WristMenu { get; }
 
 		private Mod Mod;
-		internal H3API(Mod mod)
+		private H3API(Mod mod)
 		{
 			Instance = this;
 			Mod = mod;
-			LockablePanel = new LockablePanel();
 			WristMenu = new WristMenu();
 		}
+
+		internal static H3API GetOrInit(Mod mod) => Instance ?? new H3API(mod);
 	}
 }

@@ -25,6 +25,9 @@ namespace Deli.H3VR.Api
 
 		private void FVRWristMenuOnAwake(On.FistVR.FVRWristMenu.orig_Awake orig, FVRWristMenu self)
 		{
+			// Hijack this event and set the options panel prefab for lockable panels
+			LockablePanel.OptionsPanelPrefab = self.OptionsPanelPrefab;
+
 			// We want to place our new button below the spectator panel button (idx 16)
 			Button spectatorButton = self.Buttons[16];
 			RectTransform spectatorButtonRt = spectatorButton.GetComponent<RectTransform>();
