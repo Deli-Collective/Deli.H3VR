@@ -5,6 +5,16 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+        <PackageId>Deli.H3VR.Patcher</PackageId>
+        <Title>Deli.H3VR Patcher</Title>
+        <Authors>nrgill28</Authors>
+        <Description>Patching stage for Deli.H3VR</Description>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+
+        <PackageProjectUrl>https://github.com/Deli-Collective/Deli.H3VR</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Deli-Collective/Deli.H3VR.git</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
