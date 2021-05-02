@@ -12,7 +12,6 @@ namespace Deli.H3VR.Api
 		// And also a reference to this object's current panel
 		private GameObject? _currentPanel;
 		public Texture2D? TextureOverride;
-		// private Action<LayoutWidget> _widget; TODO
 		public event Action<GameObject>? Configure;
 
 		/// <summary>

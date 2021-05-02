@@ -22,7 +22,7 @@ namespace Deli.H3VR.LogPanel
 		public LogPanelBehaviour()
 		{
 			// Register a new wrist menu button
-			H3API.GetOrInit(Source).WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
+			WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
 
 			// Register ourselves as the new log listener and try to grab what's already been captured
 			BepInEx.Logging.Logger.Listeners.Add(this);

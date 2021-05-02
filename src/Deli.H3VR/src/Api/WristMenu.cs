@@ -16,14 +16,14 @@ namespace Deli.H3VR.Api
 			public UnityAction<FVRWristMenu> OnClick { get; set; }
 		}
 
-		private readonly List<WristMenuButtonOptions> _registeredWristMenuButtons = new();
+		private static readonly List<WristMenuButtonOptions> RegisteredWristMenuButtons = new();
 
-		internal WristMenu()
+		static WristMenu()
 		{
 			On.FistVR.FVRWristMenu.Awake += FVRWristMenuOnAwake;
 		}
 
-		private void FVRWristMenuOnAwake(On.FistVR.FVRWristMenu.orig_Awake orig, FVRWristMenu self)
+		private static void FVRWristMenuOnAwake(On.FistVR.FVRWristMenu.orig_Awake orig, FVRWristMenu self)
 		{
 			// Hijack this event and set the options panel prefab for lockable panels
 			LockablePanel.OptionsPanelPrefab = self.OptionsPanelPrefab;
@@ -36,7 +36,7 @@ namespace Deli.H3VR.Api
 			RectTransform canvas = self.transform.Find("MenuGo/Canvas").GetComponent<RectTransform>();
 			OptionsPanel_ButtonSet buttonSet = canvas.GetComponent<OptionsPanel_ButtonSet>();
 			Vector2 size = canvas.sizeDelta;
-			size.y += spectatorButtonRt.sizeDelta.y * _registeredWristMenuButtons.Count;
+			size.y += spectatorButtonRt.sizeDelta.y * RegisteredWristMenuButtons.Count;
 			canvas.sizeDelta = size;
 
 			// So for any UI elements that are LOWER than this button, move them down by the height of the button
@@ -44,12 +44,12 @@ namespace Deli.H3VR.Api
 			{
 				if (!(child.anchoredPosition.y < spectatorButtonRt.anchoredPosition.y)) continue;
 				Vector2 pos = child.anchoredPosition;
-				pos.y -= spectatorButtonRt.sizeDelta.y * _registeredWristMenuButtons.Count;
+				pos.y -= spectatorButtonRt.sizeDelta.y * RegisteredWristMenuButtons.Count;
 				child.anchoredPosition = pos;
 			}
 
 			// Make all the buttons
-			for (int i = 0; i < _registeredWristMenuButtons.Count; i++)
+			for (int i = 0; i < RegisteredWristMenuButtons.Count; i++)
 			{
 				// Copy the spectator button and place it where it should be
 				Button newButton = Object.Instantiate(spectatorButton, canvas);
@@ -59,7 +59,7 @@ namespace Deli.H3VR.Api
 				newButtonRt.anchoredPosition = pos;
 
 				// Apply the options
-				WristMenuButtonOptions options = _registeredWristMenuButtons[i];
+				WristMenuButtonOptions options = RegisteredWristMenuButtons[i];
 				newButton.GetComponentInChildren<Text>().text = options.Text;
 				newButton.onClick = new Button.ButtonClickedEvent();
 				newButton.onClick.AddListener(() =>
@@ -89,9 +89,9 @@ namespace Deli.H3VR.Api
 		/// });
 		/// </code>
 		/// </example>
-		public void RegisterWristMenuButton(string text, UnityAction<FVRWristMenu> onClick)
+		public static void RegisterWristMenuButton(string text, UnityAction<FVRWristMenu> onClick)
 		{
-			_registeredWristMenuButtons.Add(new WristMenuButtonOptions
+			RegisteredWristMenuButtons.Add(new WristMenuButtonOptions
 			{
 				Text = text,
 				OnClick = onClick
