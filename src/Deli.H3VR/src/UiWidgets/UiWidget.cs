@@ -10,7 +10,7 @@ namespace Deli.H3VR.UiWidgets
 	public class UiWidget : MonoBehaviour
 	{
 		public RectTransform RectTransform;
-		public WidgetManager Manager;
+		public WidgetDefaults Defaults;
 
 		/// <summary>
 		///		All configuration of widgets are done in their Awake() methods.
@@ -18,7 +18,7 @@ namespace Deli.H3VR.UiWidgets
 		protected virtual void Awake()
 		{
 			// Make sure we're a 2D UI element
-			Manager = WidgetManager.Instance;
+			Defaults = WidgetDefaults.Instance;
 			RectTransform = gameObject.AddComponent<RectTransform>();
 		}
 

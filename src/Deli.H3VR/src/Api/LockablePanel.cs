@@ -1,4 +1,5 @@
 ﻿using System;
+using FistVR;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -79,6 +80,9 @@ namespace Deli.H3VR.Api
 			{
 				Object.Destroy(child.gameObject);
 			}
+
+			// Then remove the old component
+			Object.Destroy(panel.GetComponent<OptionsPanel_Screenmanager>());
 		}
 	}
 }

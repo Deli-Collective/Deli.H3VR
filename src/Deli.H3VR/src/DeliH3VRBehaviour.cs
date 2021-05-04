@@ -4,23 +4,29 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx.Logging;
 using Deli.H3VR.Api;
+using Deli.H3VR.LogPanel;
 using Deli.H3VR.Patcher;
 using Deli.Runtime;
 using Deli.Setup;
 using Deli.VFS;
 using FistVR;
+using Steamworks;
 using UnityEngine;
 
-namespace Deli.H3VR.LogPanel
+namespace Deli.H3VR
 {
-	public class LogPanelBehaviour : DeliBehaviour, ILogListener
+	public class DeliH3VRBehaviour : DeliBehaviour, ILogListener
 	{
 		private readonly List<LogEventArgs> _logEvents;
 		private readonly LockablePanel _panel;
 		private BepInExLogPanel? _logPanelComponent;
 
-		public LogPanelBehaviour()
+		public DeliH3VRBehaviour()
 		{
+			// Log the game build ID
+			SteamAPI.Init();
+			Logger.LogInfo("Deli H3VR initialized. Game build ID: " + SteamApps.GetAppBuildId());
+
 			// Register a new wrist menu button
 			WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
 
