@@ -13,8 +13,9 @@ namespace Deli.H3VR.UiWidgets.Layout
 
 		public void AddChild<T>(Action<T> configure) where T : UiWidget
 		{
-			GameObject go = new(nameof(T));
-			CreateAndConfigureWidget(go, configure);
+			T widget = CreateAndConfigureWidget(gameObject, configure);
+			widget.RectTransform.localPosition = Vector3.zero;
+			widget.RectTransform.localScale = Vector3.one;
 		}
 	}
 }

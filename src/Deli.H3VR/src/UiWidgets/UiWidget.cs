@@ -1,4 +1,5 @@
 ﻿using System;
+using On.FistVR;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +10,8 @@ namespace Deli.H3VR.UiWidgets
 	/// </summary>
 	public class UiWidget : MonoBehaviour
 	{
-		public RectTransform RectTransform;
-		public WidgetDefaults Defaults;
+		public RectTransform RectTransform = null!;
+		public WidgetDefaults Defaults = null!;
 
 		/// <summary>
 		///		All configuration of widgets are done in their Awake() methods.
@@ -18,8 +19,9 @@ namespace Deli.H3VR.UiWidgets
 		protected virtual void Awake()
 		{
 			// Make sure we're a 2D UI element
-			Defaults = WidgetDefaults.Instance;
+			Defaults = WidgetDefaults.Instance ?? throw new InvalidOperationException("Widget defaults were null!");
 			RectTransform = gameObject.AddComponent<RectTransform>();
+
 		}
 
 		/// <summary>
@@ -31,7 +33,9 @@ namespace Deli.H3VR.UiWidgets
 		/// <returns>The created widget</returns>
 		public static T CreateAndConfigureWidget<T>(GameObject go, Action<T> configure) where T : UiWidget
 		{
-			T widget = go.AddComponent<T>();
+			GameObject widgetGo = new(nameof(T));
+			widgetGo.transform.SetParent(go.transform);
+			T widget = widgetGo.AddComponent<T>();
 			configure(widget);
 			return widget;
 		}
