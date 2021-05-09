@@ -25,6 +25,9 @@ namespace Deli.H3VR.Api
 
 		private static void FVRWristMenuOnAwake(On.FistVR.FVRWristMenu.orig_Awake orig, FVRWristMenu self)
 		{
+			// Note to self; this is required and very important.
+			orig(self);
+
 			// Hijack this event and set the options panel prefab for lockable panels
 			LockablePanel.OptionsPanelPrefab = self.OptionsPanelPrefab;
 
