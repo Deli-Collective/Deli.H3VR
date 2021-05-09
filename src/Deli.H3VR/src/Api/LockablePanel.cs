@@ -7,9 +7,6 @@ namespace Deli.H3VR.Api
 {
 	public class LockablePanel
 	{
-		// We need a reference to the options panel prefab
-		internal static GameObject? OptionsPanelPrefab;
-
 		// And also a reference to this object's current panel
 		private GameObject? _currentPanel;
 		public Texture2D? TextureOverride;
@@ -47,12 +44,13 @@ namespace Deli.H3VR.Api
 		/// </summary>
 		/// <returns>The parent game object of the panel</returns>
 		/// <exception cref="InvalidOperationException">Method was called before a reference to the options panel prefab was taken</exception>
+		// ReSharper disable once MemberCanBePrivate.Global
 		public static GameObject GetCleanLockablePanel()
 		{
-			if (OptionsPanelPrefab is null || !OptionsPanelPrefab)
+			if (H3Api.Instance.WristMenu is null || !H3Api.Instance.WristMenu)
 				throw new InvalidOperationException("You're trying to create a lockable panel too early! Please wait until the runtime phase.");
 
-			GameObject panel = Object.Instantiate(OptionsPanelPrefab);
+			GameObject panel = Object.Instantiate(H3Api.Instance.WristMenu.OptionsPanelPrefab);
 			CleanPanel(panel);
 			return panel;
 		}

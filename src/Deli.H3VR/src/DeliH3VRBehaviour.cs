@@ -5,15 +5,12 @@ using System.IO;
 using BepInEx.Logging;
 using Deli.H3VR.Api;
 using Deli.H3VR.Patcher;
-using Deli.H3VR.UiWidgets;
-using Deli.H3VR.UiWidgets.Layout;
 using Deli.Runtime;
 using Deli.Setup;
 using Deli.VFS;
 using FistVR;
 using Steamworks;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Deli.H3VR
 {
@@ -21,8 +18,8 @@ namespace Deli.H3VR
 	{
 		private readonly List<LogEventArgs> _logEvents;
 		private readonly LockablePanel _logPanel;
-		private readonly LockablePanel _utilityPanel;
 		private BepInExLogPanel? _logPanelComponent;
+		private readonly H3Api _api = H3Api.Instance;
 
 		public DeliH3VRBehaviour()
 		{
@@ -48,12 +45,7 @@ namespace Deli.H3VR
 			// Make a new LockablePanel
 			_logPanel = new LockablePanel();
 			_logPanel.Configure += ConfigureLogPanel;
-			WristMenu.RegisterWristMenuButton("Spawn Log Panel", SpawnLogPanel);
-
-			// And one for the utility panel
-			_utilityPanel = new LockablePanel();
-			_utilityPanel.Configure += ConfigureUtilityPanel;
-			WristMenu.RegisterWristMenuButton("Spawn Utility Panel", SpawnUtilityPanel);
+			_api.WristMenuButtons.Add(new WristMenuButton("Spawn Log Panel", int.MaxValue, SpawnLogPanel));
 
 			// Setup a callback to read and apply our texture
 			Stages.Runtime += stage => StartCoroutine(OnRuntime(stage));
@@ -61,12 +53,6 @@ namespace Deli.H3VR
 
 		private IEnumerator OnRuntime(RuntimeStage stage)
 		{
-			// Pull the button sprite and font for our use later
-			Transform button = LockablePanel.OptionsPanelPrefab!.transform.Find("OptionsCanvas_0_Main/Canvas/Label_SelectASection/Button_Option_1_Locomotion");
-			WidgetDefaults defaults = new();
-			defaults.ButtonSprite = button.GetComponent<Image>().sprite;
-			defaults.TextFont = button.GetChild(0).GetComponent<Text>().font;
-
 			// Load the log panel texture
 			DelayedReader<Texture2D> texReader = stage.GetReader<Texture2D>();
 			var op = texReader(Resources.GetFile("LogPanel.png") ?? throw new FileNotFoundException("Log panel texture is missing!"));
@@ -74,6 +60,9 @@ namespace Deli.H3VR
 			_logPanel.TextureOverride = op.Result;
 		}
 
+		#region Utility Panel (Widgets test)
+
+		/*
 		private void ConfigureUtilityPanel(GameObject panel)
 		{
 			GameObject canvas = panel.transform.Find("OptionsCanvas_0_Main/Canvas").gameObject;
@@ -103,19 +92,24 @@ namespace Deli.H3VR
 			});
 		}
 
-		private void SpawnUtilityPanel(FVRWristMenu wristMenu)
+		private void SpawnUtilityPanel(H3Api api)
 		{
+			if (api.WristMenu is null || !api.WristMenu) return;
 			GameObject panel = _utilityPanel.GetOrCreatePanel();
-			wristMenu.m_currentHand.RetrieveObject(panel.GetComponent<FVRPhysicalObject>());
+			api.WristMenu.m_currentHand.RetrieveObject(panel.GetComponent<FVRPhysicalObject>());
 		}
+		*/
+
+		#endregion
 
 		#region Log Panel Stuffs
 
 		// Wrist menu button callback. Gets our panel instance and makes the hand retrieve it.
-		private void SpawnLogPanel(FVRWristMenu wristMenu)
+		private void SpawnLogPanel(WristMenuButton caller, H3Api api)
 		{
+			if (api.WristMenu is null || !api.WristMenu) return;
 			GameObject panel = _logPanel.GetOrCreatePanel();
-			wristMenu.m_currentHand.RetrieveObject(panel.GetComponent<FVRPhysicalObject>());
+			api.WristMenu.m_currentHand.RetrieveObject(panel.GetComponent<FVRPhysicalObject>());
 		}
 
 		private void ConfigureLogPanel(GameObject panel)

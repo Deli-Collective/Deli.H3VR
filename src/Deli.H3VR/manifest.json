@@ -11,6 +11,7 @@
       "hooks.conf": "deli:monomod.hookgen"
     },
     "setup": {
+      "WindowsBase.dll": "deli:assembly",
       "Deli.H3VR.dll": "deli:assembly"
     }
   }
