@@ -8,7 +8,7 @@ using FistVR;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Deli.H3VR.LogPanel
+namespace Deli.H3VR
 {
 	public class BepInExLogPanel : MonoBehaviour
 	{
