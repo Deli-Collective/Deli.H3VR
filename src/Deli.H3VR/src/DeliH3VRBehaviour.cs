@@ -49,6 +49,9 @@ namespace Deli.H3VR
 
 			// Setup a callback to read and apply our texture
 			Stages.Runtime += stage => StartCoroutine(OnRuntime(stage));
+
+			// Disable any form of Steam leaderboard uploading
+			On.Steamworks.SteamUserStats.UploadLeaderboardScore += (_, _, _, _, _, _) => SteamAPICall_t.Invalid;
 		}
 
 		private IEnumerator OnRuntime(RuntimeStage stage)

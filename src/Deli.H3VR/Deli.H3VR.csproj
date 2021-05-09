@@ -40,10 +40,13 @@
             <HintPath>..\libs\Assembly-CSharp_publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\libs\Assembly-CSharp-firstpass.dll</HintPath>
+          <HintPath>..\libs\Assembly-CSharp-firstpass_publicized.dll</HintPath>
         </Reference>
         <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>..\libs\MMHOOK_Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="MMHOOK_Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\libs\MMHOOK_Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\libs\UnityEngine.UI.dll</HintPath>
