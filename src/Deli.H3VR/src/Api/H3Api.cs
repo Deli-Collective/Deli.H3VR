@@ -26,7 +26,7 @@ namespace Deli.H3VR.Api
 		/// </summary>
 		public FVRWristMenu? WristMenu { get; private set; }
 
-		private readonly List<Mod> _scoreboardDisabled = new();
+		private readonly HashSet<Mod> _scoreboardDisabled = new();
 		private readonly ManualLogSource _logger = Logger.CreateLogSource("H3Api");
 
 		private H3Api()
@@ -56,15 +56,8 @@ namespace Deli.H3VR.Api
 		/// <param name="disabled">If you want scoreboard submission disabled</param>
 		public void RequestLeaderboardDisable(Mod source, bool disabled)
 		{
-			switch (disabled)
-			{
-				case true when !_scoreboardDisabled.Contains(source):
-					_scoreboardDisabled.Add(source);
-					break;
-				case false when _scoreboardDisabled.Contains(source):
-					_scoreboardDisabled.Remove(source);
-					break;
-			}
+			if (disabled) _scoreboardDisabled.Add(source);
+			else _scoreboardDisabled.Remove(source);
 		}
 	}
 }
