@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Deli.H3VR
 {
-	public class ObservableList<T> : IList<T>
+	public class ObservableHashSet<T> : IList<T>
 	{
 		private readonly List<T> _list = new();
 

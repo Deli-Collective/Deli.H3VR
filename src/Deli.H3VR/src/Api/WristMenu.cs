@@ -15,7 +15,7 @@ namespace Deli.H3VR.Api
 		/// </summary>
 		public ICollection<WristMenuButton> WristMenuButtons => _wristMenuButtons;
 
-		private readonly ObservableList<WristMenuButton> _wristMenuButtons = new();
+		private readonly ObservableHashSet<WristMenuButton> _wristMenuButtons = new();
 		private readonly Dictionary<WristMenuButton, Button> _currentButtons = new();
 
 		private void WristMenuButtonsItemAdded(WristMenuButton button)
