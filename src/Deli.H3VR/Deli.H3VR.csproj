@@ -33,6 +33,7 @@
         <None Update="res/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Remove="Deli.H3VR.deli" />
     </ItemGroup>
 
     <ItemGroup>
