@@ -5,52 +5,20 @@ using Object = UnityEngine.Object;
 
 namespace Deli.H3VR.Api
 {
-	public class LockablePanel
+	public partial class H3Api
 	{
-		// And also a reference to this object's current panel
-		private GameObject? _currentPanel;
-		public Texture2D? TextureOverride;
-		public event Action<GameObject>? Configure;
-
-		/// <summary>
-		/// Returns this instance of the lockable panel, creating and configuring it if necessary.
-		/// </summary>
-		/// <returns>The parent game object of the panel</returns>
-		public GameObject GetOrCreatePanel()
-		{
-			// If we've never made a panel or it's gotten destroyed make a new one
-			if (_currentPanel is null || !_currentPanel)
-			{
-				// Make a new empty panel
-				_currentPanel = GetCleanLockablePanel();
-
-				// If we have a texture override, set it here
-				if (TextureOverride is not null && TextureOverride)
-				{
-
-					Renderer tabletRenderer = _currentPanel.transform.Find("Tablet").GetComponent<Renderer>();
-					tabletRenderer.material.mainTexture = TextureOverride;
-				}
-
-				// Invoke the configure event
-				Configure?.Invoke(_currentPanel);
-			}
-
-			return _currentPanel;
-		}
-
 		/// <summary>
 		/// Returns a new lockable panel that has been completely emptied of content
 		/// </summary>
 		/// <returns>The parent game object of the panel</returns>
 		/// <exception cref="InvalidOperationException">Method was called before a reference to the options panel prefab was taken</exception>
 		// ReSharper disable once MemberCanBePrivate.Global
-		public static GameObject GetCleanLockablePanel()
+		public GameObject GetCleanLockablePanel()
 		{
-			if (H3Api.Instance.WristMenu is null || !H3Api.Instance.WristMenu)
+			if (WristMenu is null || !WristMenu)
 				throw new InvalidOperationException("You're trying to create a lockable panel too early! Please wait until the runtime phase.");
 
-			GameObject panel = Object.Instantiate(H3Api.Instance.WristMenu.OptionsPanelPrefab);
+			GameObject panel = Object.Instantiate(WristMenu.OptionsPanelPrefab);
 			CleanPanel(panel);
 			return panel;
 		}
@@ -81,6 +49,40 @@ namespace Deli.H3VR.Api
 
 			// Then remove the old component
 			Object.Destroy(panel.GetComponent<OptionsPanel_Screenmanager>());
+		}
+	}
+
+	public class LockablePanel
+	{
+		// And also a reference to this object's current panel
+		private GameObject? _currentPanel;
+		public Texture2D? TextureOverride;
+		public event Action<GameObject>? Configure;
+
+		/// <summary>
+		/// Returns this instance of the lockable panel, creating and configuring it if necessary.
+		/// </summary>
+		/// <returns>The parent game object of the panel</returns>
+		public GameObject GetOrCreatePanel()
+		{
+			// If we've never made a panel or it's gotten destroyed make a new one
+			if (_currentPanel is null || !_currentPanel)
+			{
+				// Make a new empty panel
+				_currentPanel = H3Api.Instance.GetCleanLockablePanel();
+
+				// If we have a texture override, set it here
+				if (TextureOverride is not null && TextureOverride)
+				{
+					Renderer tabletRenderer = _currentPanel.transform.Find("Tablet").GetComponent<Renderer>();
+					tabletRenderer.material.mainTexture = TextureOverride;
+				}
+
+				// Invoke the configure event
+				Configure?.Invoke(_currentPanel);
+			}
+
+			return _currentPanel;
 		}
 	}
 }
