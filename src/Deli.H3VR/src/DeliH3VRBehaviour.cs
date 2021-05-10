@@ -5,12 +5,14 @@ using System.IO;
 using BepInEx.Logging;
 using Deli.H3VR.Api;
 using Deli.H3VR.Patcher;
+using Deli.H3VR.UiWidgets;
 using Deli.Runtime;
 using Deli.Setup;
 using Deli.VFS;
 using FistVR;
 using Steamworks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Deli.H3VR
 {
@@ -53,6 +55,11 @@ namespace Deli.H3VR
 
 		private IEnumerator OnRuntime(RuntimeStage stage)
 		{
+			// Pull the button sprite and font for our use later
+			Transform button = _api.WristMenu!.OptionsPanelPrefab.transform.Find("OptionsCanvas_0_Main/Canvas/Label_SelectASection/Button_Option_1_Locomotion");
+			WidgetStyle.DefaultButtonSprite = button.GetComponent<Image>().sprite;
+			WidgetStyle.DefaultTextFont = button.GetChild(0).GetComponent<Text>().font;
+
 			// Load the log panel texture
 			DelayedReader<Texture2D> texReader = stage.GetReader<Texture2D>();
 			var op = texReader(Resources.GetFile("LogPanel.png") ?? throw new FileNotFoundException("Log panel texture is missing!"));
@@ -116,7 +123,7 @@ namespace Deli.H3VR
 		{
 			Transform canvasTransform = panel.transform.Find("OptionsCanvas_0_Main/Canvas");
 			_logPanelComponent = panel.AddComponent<BepInExLogPanel>();
-			_logPanelComponent.CreateWithExisting(Source, canvasTransform, _logEvents);
+			_logPanelComponent.CreateWithExisting(Source, canvasTransform.gameObject, _logEvents);
 		}
 
 		void ILogListener.LogEvent(object sender, LogEventArgs eventArgs)

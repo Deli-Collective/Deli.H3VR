@@ -1,9 +1,14 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace Deli.H3VR.UiWidgets.Layout
+namespace Deli.H3VR.UiWidgets
 {
-	public class LayoutWidget : UiWidget
+	/// <summary>
+	///		Widget that represents a layout group (e.g. GridLayoutGroup or HorizontalLayoutGroup) that can have children widgets
+	/// </summary>
+	/// <typeparam name="TLayout">The type of the layout group</typeparam>
+	public class LayoutWidget<TLayout> : UiWidget<TLayout> where TLayout : LayoutGroup
 	{
 		protected override void Awake()
 		{

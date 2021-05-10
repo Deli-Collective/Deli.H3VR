@@ -2,12 +2,13 @@
 
 namespace Deli.H3VR.UiWidgets
 {
-	public class TextWidget : UiWidget
+	public class TextWidget : UiWidget<Text>
 	{
 		protected override void Awake()
 		{
 			base.Awake();
-			gameObject.AddComponent<Text>();
+			MainComponent.font = Style.TextFont;
+			MainComponent.color = Style.TextColor;
 		}
 	}
 }
