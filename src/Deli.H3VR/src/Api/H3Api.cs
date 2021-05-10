@@ -1,5 +1,7 @@
-﻿using BepInEx.Logging;
+﻿using System.Collections.Generic;
+using BepInEx.Logging;
 using FistVR;
+using Steamworks;
 
 namespace Deli.H3VR.Api
 {
@@ -24,7 +26,8 @@ namespace Deli.H3VR.Api
 		/// </summary>
 		public FVRWristMenu? WristMenu { get; private set; }
 
-		private ManualLogSource _logger = Logger.CreateLogSource("H3Api");
+		private readonly List<Mod> _scoreboardDisabled = new();
+		private readonly ManualLogSource _logger = Logger.CreateLogSource("H3Api");
 
 		private H3Api()
 		{
@@ -32,6 +35,36 @@ namespace Deli.H3VR.Api
 			On.FistVR.FVRWristMenu.Awake += FVRWristMenuOnAwake;
 			_wristMenuButtons.ItemAdded += WristMenuButtonsItemAdded;
 			_wristMenuButtons.ItemRemoved += WristMenuButtonsItemRemoved;
+
+			// Disable any form of Steam leaderboard uploading
+			On.Steamworks.SteamUserStats.UploadLeaderboardScore += (orig, leaderboard, method, score, details, count) =>
+			{
+				// If no mods have requested disabling leaderboards, let it pass
+				if (_scoreboardDisabled.Count == 0) return orig(leaderboard, method, score, details, count);
+
+				// Otherwise log that it's been disabled and return an invalid call
+				_logger.LogInfo("Scoreboard submission is disabled as requested by " + _scoreboardDisabled.Count + " mod(s)");
+				return SteamAPICall_t.Invalid;
+			};
+		}
+
+		/// <summary>
+		///		API method for requesting scoreboard submission to be disabled. If at the time of score submission any mod has requested submission
+		///		to be disabled, it will be skipped.
+		/// </summary>
+		/// <param name="source">Your mod</param>
+		/// <param name="disabled">If you want scoreboard submission disabled</param>
+		public void RequestLeaderboardDisable(Mod source, bool disabled)
+		{
+			switch (disabled)
+			{
+				case true when !_scoreboardDisabled.Contains(source):
+					_scoreboardDisabled.Add(source);
+					break;
+				case false when _scoreboardDisabled.Contains(source):
+					_scoreboardDisabled.Remove(source);
+					break;
+			}
 		}
 	}
 }
