@@ -112,7 +112,7 @@ namespace Deli.H3VR
 		#region Log Panel Stuffs
 
 		// Wrist menu button callback. Gets our panel instance and makes the hand retrieve it.
-		private void SpawnLogPanel(WristMenuButton caller, H3Api api)
+		private void SpawnLogPanel(H3Api api, WristMenuButton caller)
 		{
 			if (api.WristMenu is null || !api.WristMenu) return;
 			GameObject panel = _logPanel.GetOrCreatePanel();

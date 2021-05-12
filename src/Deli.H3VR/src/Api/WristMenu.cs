@@ -91,7 +91,7 @@ namespace Deli.H3VR.Api
 			newButton.onClick.AddListener(() =>
 			{
 				wristMenu.Aud.PlayOneShot(wristMenu.AudClip_Engage);
-				button.Action(button, this);
+				button.CallOnClick(this);
 			});
 
 			// Now we need to modify some things to accomodate this new button
@@ -100,8 +100,10 @@ namespace Deli.H3VR.Api
 			buttonSet.ButtonImagesInSet = buttonSet.ButtonImagesInSet.AddToArray(newButton.GetComponent<Image>());
 			wristMenu.Buttons.Add(newButton);
 
-			// Finally add it to the dict
+			// Finally add it to the dict and call the create event
 			_currentButtons.Add(button, newButton);
+			button.CurrentButton = pointable;
+			button.CallOnCreate(this, pointable);
 		}
 
 		/// <summary>
@@ -150,24 +152,42 @@ namespace Deli.H3VR.Api
 	/// </summary>
 	public class WristMenuButton
 	{
-		public delegate void WristMenuButtonOnClick(WristMenuButton caller, H3Api api);
-
 		public string Text { get; }
-		public WristMenuButtonOnClick Action { get; }
 		public int Priority { get; }
 
-		public WristMenuButton(string text, WristMenuButtonOnClick action)
+		/// <summary>
+		///		Reference to this button's actual wrist menu button instance. This may be null when the button is not on the wrist menu
+		/// </summary>
+		public FVRWristMenuPointableButton? CurrentButton { get; internal set; }
+
+		/// <summary>
+		///		Called when this button is added to the wrist menu and provides a reference to the game object that was created
+		/// </summary>
+		public event WristMenuButtonOnCreate? OnCreate;
+
+		/// <summary>
+		///		Called when this button is selected by the player
+		/// </summary>
+		public event WristMenuButtonOnClick? OnClick;
+
+		public WristMenuButton(string text, WristMenuButtonOnClick? clickAction = null)
 		{
 			Text = text;
-			Action = action;
 			Priority = 0;
+			if (clickAction is not null) OnClick += clickAction;
 		}
 
-		public WristMenuButton(string text, int priority, WristMenuButtonOnClick action)
+		public WristMenuButton(string text, int priority, WristMenuButtonOnClick? clickAction = null)
 		{
 			Text = text;
 			Priority = priority;
-			Action = action;
+			if (clickAction is not null) OnClick += clickAction;
 		}
+
+		public delegate void WristMenuButtonOnClick(H3Api api, WristMenuButton caller);
+		public delegate void WristMenuButtonOnCreate(H3Api api, FVRWristMenuPointableButton button);
+
+		internal void CallOnCreate(H3Api api, FVRWristMenuPointableButton button) => OnCreate?.Invoke(api, button);
+		internal void CallOnClick(H3Api api) => OnClick?.Invoke(api, this);
 	}
 }
